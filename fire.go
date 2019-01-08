@@ -2,13 +2,10 @@ package main
 
 
 import (
-    "fmt"
     "syscall/js"
 )
 
 func main(){
-    fmt.Println("Hello world!")
-
     doc := js.Global().Get("document")
     canvas := js.Global().Get("document").Call("getElementById", "mycanvas")
 
@@ -19,14 +16,18 @@ func main(){
     canvas.Set("height", bodyH)
 
     ctx := canvas.Call("getContext", "2d")
-    _ = ctx
 
     done := make(chan struct{}, 0) // something to keep our thread alive
 
     var renderFrame js.Callback
 
+    ctx.Set("globalAlpha", 0.5)
     renderFrame = js.NewCallback(func(args []js.Value) {
-        fmt.Println("output!")
+        ctx.Call("beginPath")
+        ctx.Set("fillStyle", "#ffff00")
+        ctx.Set("strokeStyle", "#ffff00")
+        ctx.Call("rect", 20,20,150,150)
+        ctx.Call("fill")
         js.Global().Call("requestAnimationFrame", renderFrame)
     })
 
@@ -36,7 +37,6 @@ func main(){
     js.Global().Call("requestAnimationFrame", renderFrame)
 
     <-done
-    
-
 }
+
 
