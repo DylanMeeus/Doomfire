@@ -49,44 +49,6 @@ var colours = []string{
             "#FFFFFF", 
 }
 
-var rgbs = []uint32{0x07,0x07,0x07,
-            0x1F,0x07,0x07,
-            0x2F,0x0F,0x07,
-            0x47,0x0F,0x07,
-            0x57,0x17,0x07,
-            0x67,0x1F,0x07,
-            0x77,0x1F,0x07,
-            0x8F,0x27,0x07,
-            0x9F,0x2F,0x07,
-            0xAF,0x3F,0x07,
-            0xBF,0x47,0x07,
-            0xC7,0x47,0x07,
-            0xDF,0x4F,0x07,
-            0xDF,0x57,0x07,
-            0xDF,0x57,0x07,
-            0xD7,0x5F,0x07,
-            0xD7,0x5F,0x07,
-            0xD7,0x67,0x0F,
-            0xCF,0x6F,0x0F,
-            0xCF,0x77,0x0F,
-            0xCF,0x7F,0x0F,
-            0xCF,0x87,0x17,
-            0xC7,0x87,0x17,
-            0xC7,0x8F,0x17,
-            0xC7,0x97,0x1F,
-            0xBF,0x9F,0x1F,
-            0xBF,0x9F,0x1F,
-            0xBF,0xA7,0x27,
-            0xBF,0xA7,0x27,
-            0xBF,0xAF,0x2F,
-            0xB7,0xAF,0x2F,
-            0xB7,0xB7,0x2F,
-            0xB7,0xB7,0x37,
-            0xCF,0xCF,0x6F,
-            0xDF,0xDF,0x9F,
-            0xEF,0xEF,0xC7,
-            0xFF,0xFF,0xFF,
-            }
 
 const (
     fw = 10
@@ -115,33 +77,18 @@ func main(){
 
     var renderFrame js.Callback
 
-    fire := [36][36]uint32{}
+    fire := [36][36]string{}
 
-    for _,fr := range fire {
-        for i,_ := range fr {
-            fr[i] = 0
-        }
-    }
 
-    palette := make([]uint32, 37)
-    for i := 0; i < len(rgbs); i+=3 {
-        r := rgbs[i]
-        g := rgbs[i+1]
-        b := rgbs[i+2]
-        clor := r
-        clor = (clor << 8) + g
-        clor = (clor << 8) + b
-        palette = append(palette, clor)
-    }
 
     for y,row := range fire {
         for i := 0; i < len(row); i++ {
             if y == 0 {
-                fire[y][i] = 0
+                fire[y][i] = colours[0]
             } else if y == 1 {
-                fire[y][i] = palette[len(palette)-1]
+                fire[y][i] = colours[len(colours)-1]
             } else {
-                fire[y][i] = 0
+                fire[y][i] = colours[0]
             }
         }
     }
@@ -150,12 +97,13 @@ func main(){
     tdiff := 0
     renderFrame = js.NewCallback(func(args []js.Value) {
         tdiff++
-        if tdiff % 10 == 0 {
+        if tdiff % 20 == 0 {
             tdiff = 0 
-            updateFire(fire, palette)
+            fmt.Println("updating")
+            updateFire(&fire)
             for row,firerow := range fire {
                 for col,fireval := range firerow {
-                    ctx.Set("fillStyle", fmt.Sprintf("#%06x", int64(fireval) & 0xffffff ))
+                    ctx.Set("fillStyle", fireval)
                     ctx.Call("fillRect", 20 + (col * fw), maxH - float64(row*fh),fw,fh)
                 }
             }
@@ -171,10 +119,10 @@ func main(){
     <-done
 }
 
-func updateFire(fire [36][36]uint32, palette []uint32){
+func updateFire(fire *[36][36]string){
     // we start from the top!
-    spread := func(cury, curx int) uint32 {
-        return palette[30]
+    spread := func(cury, curx int) string {
+        return colours[cury]
         //return fire[cury-1][curx]
     }
     for y := 1; y < len(fire); y++ {
