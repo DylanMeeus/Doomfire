@@ -2,7 +2,6 @@ package main
 
 
 import (
-    "fmt"
     "syscall/js"
     "math/rand"
 )
@@ -52,7 +51,7 @@ var colours = []string{
 
 
 const (
-    fw = 10
+    fw = 1
     fh = 10
 )
 
@@ -78,19 +77,13 @@ func main(){
 
     var renderFrame js.Callback
 
-    fire := [36][36]string{}
+    fire := [36][400]string{}
 
 
 
     for y,row := range fire {
         for i := 0; i < len(row); i++ {
-            if y == 0 {
-                fire[y][i] = colours[0]
-            } else if y == 1 {
-                fire[y][i] = colours[len(colours)-1]
-            } else {
-                fire[y][i] = colours[0]
-            }
+            fire[y][i] = colours[len(colours)-1-y]
         }
     }
 
@@ -98,16 +91,13 @@ func main(){
     tdiff := 0
     renderFrame = js.NewCallback(func(args []js.Value) {
         tdiff++
-        if tdiff % 20 == 0 {
-            fmt.Println(bodyW)
-            fmt.Println(maxH)
+        if tdiff % 1 == 0 {
             canvas.Set("width", bodyW)
             canvas.Set("height", bodyH)
             ctx.Call("beginPath")
             ctx.Call("clearRect",0,0,bodyW,bodyH)
             //ctx.Set("globalCompositeOperation", "destination-atop")
             tdiff = 0 
-            fmt.Println("updating")
             updateFire(&fire)
             for row,firerow := range fire {
                 for col,fireval := range firerow {
@@ -129,15 +119,12 @@ func main(){
     <-done
 }
 
-func updateFire(fire *[36][36]string){
+func updateFire(fire *[36][400]string){
     // we start from the top!
     spread := func(cury, curx int) string {
         // the chance of being your own colour or the one from below
-        if rand.Float32() > 0.9 {
-            return colours[cury-1]
-        }
-        if colours[cury] == fire[cury][curx] {
-            return colours[cury]
+        if rand.Float32() > 0.7 {
+            return fire[cury-1][curx]
         }
         return fire[cury][curx]
     }
