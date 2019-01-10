@@ -14,11 +14,14 @@
 			window.onload = function () {
 				// Go code background
 				fetch('fire.go').then( res=> res.text()).then(res => {
-					let codeEl = document.getElementById("code")
+                                    //  ENABLE CODE BACKGROUND?
+					/* 
+                                        let codeEl = document.getElementById("code")
 					codeEl.innerHTML = res.replace(/&/g,"&amp;")
 																.replace(/>/g,"&gt;")
 																.replace(/</g,"&lt;") 
 					hljs.highlightBlock(codeEl)
+                                        */
 				})
 			}
 		</script>
@@ -26,7 +29,6 @@
 body,pre { margin:0;padding:0; }
 #mycanvas {
 	position:fixed;
-	opacity:0.5;
 	top:0;right:0;bottom:0;left:0;
 }
 	</style>
