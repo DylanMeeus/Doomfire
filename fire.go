@@ -2,6 +2,7 @@ package main
 
 
 import (
+    "fmt"
     "syscall/js"
     "math/rand"
 )
@@ -52,7 +53,7 @@ var colours = []string{
 
 const (
     fw = 1
-    fh = 10
+    fh = 2
 )
 
 type colour struct {
@@ -88,26 +89,25 @@ func main(){
     }
 
 
-    tdiff := 0
     renderFrame = js.NewCallback(func(args []js.Value) {
-        tdiff++
-        if tdiff % 1 == 0 {
+        fmt.Println("here")
             canvas.Set("width", bodyW)
             canvas.Set("height", bodyH)
             ctx.Call("beginPath")
             ctx.Call("clearRect",0,0,bodyW,bodyH)
             //ctx.Set("globalCompositeOperation", "destination-atop")
-            tdiff = 0 
             updateFire(&fire)
             for row,firerow := range fire {
                 for col,fireval := range firerow {
+                    _ = maxH
+                    _ = row
+                    _ = col
+                    _ = fireval
                     ctx.Set("fillStyle", fireval)
-                    ctx.Set("strokeStyle", fireval)
                     ctx.Call("fillRect", 20 + (col * fw), maxH - float64(row*fh),fw,fh)
                 }
             }
             ctx.Call("closePath")
-        }
         js.Global().Call("requestAnimationFrame", renderFrame)
     })
 
@@ -121,9 +121,10 @@ func main(){
 
 func updateFire(fire *[36][400]string){
     // we start from the top!
+    return
     spread := func(cury, curx int) string {
         // the chance of being your own colour or the one from below
-        if rand.Float32() > 0.7 {
+        if rand.Float32() > 0.2 {
             return fire[cury-1][curx]
         }
         return fire[cury][curx]
